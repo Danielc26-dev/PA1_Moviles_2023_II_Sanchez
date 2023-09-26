@@ -4,47 +4,33 @@ using UnityEngine;
 
 public class Movimiento : MonoBehaviour
 {
-    public ObjectPool objectPool;
-    public Transform spawnPoint;
-    public Transform desaparicionPoint;
-    public float velocidad = 1.0f;
-    public float tiempoEntreSpawn = 2.0f; 
+    public Transform puntoInicial;
+    public Transform puntoFinal; 
+    public float velocidad = 2.0f;
 
-    private void Start()
+    private bool enDireccionFinal = true;
+
+    void Update()
     {
-
-        InvokeRepeating("GenerarObjetoDesdePool", 0f, tiempoEntreSpawn);
-    }
-
-    void GenerarObjetoDesdePool()
-    {
-        GameObject obj = objectPool.GetObjectFromPool();
-
-        if (obj != null)
+        if (enDireccionFinal)
         {
-            obj.transform.position = spawnPoint.position;
-            obj.SetActive(true);
+            transform.position = Vector3.MoveTowards(transform.position, puntoFinal.position, velocidad * Time.deltaTime);
+            
 
-            Rigidbody rb = obj.GetComponent<Rigidbody>();
-            if (rb != null)
+            if (transform.position == puntoFinal.position)
             {
-                rb.velocity = Vector3.left * velocidad;
+                transform.position = puntoInicial.position;
+                enDireccionFinal = false;
             }
+        }
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, puntoInicial.position, velocidad * Time.deltaTime);
 
-            foreach (Transform child in transform)
+
+            if (transform.position == puntoInicial.position)
             {
-                if (child.gameObject.activeInHierarchy)
-                {
-                    child.Translate(Vector3.forward * velocidad * Time.deltaTime);
-
-                    if (child.position.x > -50f)
-                    {
-                        Debug.Log("Pase por aqui");
-                        child.gameObject.SetActive(false);
-                    }
-                }
-
-                
+                enDireccionFinal = true;
             }
         }
     }
